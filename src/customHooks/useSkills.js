@@ -6,11 +6,13 @@ import {
   initialState,
   actionTypes,
 } from "../reducers/skillReducer";
+const DEFAULT_MAX_PERCENTAGE = 100;
+const LANGUAGE_COUNT_BASE = 10;
 
 export const useSkills = () => {
   const [state, dispatch] = useReducer(skillReducer, initialState);
 
-  useEffect(() => {
+  const fetchReposApi = () => {
     dispatch({ type: actionTypes.fetch });
     axios
       .get("https://api.github.com/users/kenta-pro/repos")
@@ -25,6 +27,10 @@ export const useSkills = () => {
       .catch(() => {
         dispatch({ type: actionTypes.error });
       });
+  };
+
+  useEffect(() => {
+    fetchReposApi();
   }, []);
 
   const generateLanguageCountObj = (allLanguageList) => {
@@ -42,10 +48,10 @@ export const useSkills = () => {
   };
 
   const converseCountToPercentage = (count) => {
-    if (count > 10) {
-      return 100;
+    if (count > LANGUAGE_COUNT_BASE) {
+      return DEFAULT_MAX_PERCENTAGE;
     }
-    return count * 10;
+    return count * LANGUAGE_COUNT_BASE;
   };
 
   const sortedLanguageList = () =>
